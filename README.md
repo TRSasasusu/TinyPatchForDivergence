@@ -1,4 +1,4 @@
-# Enhance for Divergence mod
+# Enhance Divergence Mod
 
 [Divergence](https://outerwildsmods.com/mods/divergence/) gets so cool appearance again.
 
