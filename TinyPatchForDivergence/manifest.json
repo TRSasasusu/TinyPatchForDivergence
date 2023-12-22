@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/ow-mods/owml/master/schemas/manifest_schema.json",
   "filename": "TinyPatchForDivergence.dll",
   "author": "orclecle",
-  "name": "Enhance for Divergence mod",
+  "name": "Enhance Divergence Mod",
   "uniqueName": "orclecle.TinyPatchForDivergence",
   "version": "0.1.0",
   "owmlVersion": "2.9.0",
