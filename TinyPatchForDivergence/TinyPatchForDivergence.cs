@@ -10,7 +10,7 @@ namespace TinyPatchForDivergence {
         }
 
         private void Start() {
-            ModHelper.Console.WriteLine($"My mod {nameof(TinyPatchForDivergence)} is loaded!", MessageType.Success);
+            ModHelper.Console.WriteLine($"{nameof(TinyPatchForDivergence)} is loaded!", MessageType.Success);
             Patch.Initialize();
         }
     }

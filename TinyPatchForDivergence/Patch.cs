@@ -9,7 +9,11 @@ using IEnumerator = System.Collections.IEnumerator;
 namespace TinyPatchForDivergence {
     public static class Patch {
         static Coroutine _removeArtificialSun = null;
+        static Coroutine _updateFog = null;
+        static Coroutine _tuneRiverColor = null;
         static Coroutine _changeTextOfMainframe = null;
+
+        static Material _riverMat = null;
 
         public static void Initialize() {
             LoadManager.OnCompleteSceneLoad += (scene, loadScene) => {
@@ -19,6 +23,22 @@ namespace TinyPatchForDivergence {
                         _removeArtificialSun = null;
                     }
                     _removeArtificialSun = TinyPatchForDivergence.Instance.StartCoroutine(RemoveArtificialSun());
+
+                    if(_updateFog != null) {
+                        TinyPatchForDivergence.Instance.StopCoroutine(_updateFog);
+                        _updateFog = null;
+                    }
+                    _updateFog = TinyPatchForDivergence.Instance.StartCoroutine(UpdateFog());
+
+                    if(_tuneRiverColor != null) {
+                        TinyPatchForDivergence.Instance.StopCoroutine(_tuneRiverColor);
+                        _tuneRiverColor = null;
+                    }
+                    if(_riverMat != null) {
+                        GameObject.Destroy(_riverMat);
+                        _riverMat = null;
+                    }
+                    _tuneRiverColor = TinyPatchForDivergence.Instance.StartCoroutine(TuneRiverColor());
 
                     if(_changeTextOfMainframe != null) {
                         TinyPatchForDivergence.Instance.StopCoroutine(_changeTextOfMainframe);
@@ -33,12 +53,20 @@ namespace TinyPatchForDivergence {
             TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine("disable artificial sun");
             while(true) {
                 yield return null;
-                var lightsRingInterior = GameObject.Find("Sector_RingInterior/Lights_RingInterior");
-                if (lightsRingInterior) {
+                var ambientLightIPSurface = GameObject.Find("RingWorld_Body/Sector_RingInterior/Lights_RingInterior/AmbientLight_IP_Surface");
+                if (ambientLightIPSurface) {
                     yield return null; // See https://github.com/Outer-Wilds-New-Horizons/new-horizons/blob/b6702b46a7943a50877fd8f8db4cf0a0621331ee/NewHorizons/Handlers/PlanetCreationHandler.cs#L951-L952C29
                     yield return null; // but it does not have waiting idk https://github.com/Outer-Wilds-New-Horizons/new-horizons/blob/b6702b46a7943a50877fd8f8db4cf0a0621331ee/NewHorizons/Builder/Props/DetailBuilder.cs#L194
-                    lightsRingInterior.SetActive(false);
-                    //GameObject.Destroy(lightsRingInterior);
+                    ambientLightIPSurface.SetActive(false);
+                    //GameObject.Destroy(ambientLightIPSurface); // simply destroying causes broken river shader idk
+                    break;
+                }
+            }
+            while(true) {
+                yield return null;
+                var ipSunLight = GameObject.Find("RingWorld_Body/Sector_RingInterior/Lights_RingInterior/IP_SunLight");
+                if (ipSunLight) {
+                    ipSunLight.SetActive(false);
                     break;
                 }
             }
@@ -47,12 +75,59 @@ namespace TinyPatchForDivergence {
                 yield return null;
                 var artificialSunBulb = GameObject.Find("Sector_RingInterior/Geometry_RingInterior/Structure_IP_ArtificialSun/ArtificialSun_Bulb");
                 if (artificialSunBulb) {
-                    yield return null;
-                    yield return null;
-                    artificialSunBulb.SetActive(false);
-                    //GameObject.Destroy(artificialSunBulb);
+                    artificialSunBulb.GetComponent<OWEmissiveRenderer>().SetEmissionColor(Color.black);
                     break;
                 }
+            }
+
+            while(true) {
+                yield return null;
+                var hazardVolumeArtificialSun = GameObject.Find("RingWorld_Body/Sector_RingInterior/Interactibles_RingInterior/HazardVolume_ArtificialSun");
+                if(hazardVolumeArtificialSun) {
+                    hazardVolumeArtificialSun.GetComponent<OWTriggerVolume>().SetTriggerActivation(false);
+                    break;
+                }
+            }
+        }
+
+        static IEnumerator TuneRiverColor() {
+            TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine("tune river color");
+            //TessellatedRingRenderer tessellatedRingRenderer;
+            while(true) {
+                yield return null;
+                var river = GameObject.Find("RingWorld_Body/Sector_RingInterior/Volumes_RingInterior/RingRiverFluidVolume/RingworldRiver");
+                if(river) {
+                    var tessellatedRingRenderer = river.GetComponent<TessellatedRingRenderer>();
+                    _riverMat = new Material(tessellatedRingRenderer.sharedMaterial);
+                    _riverMat.SetColor("_Color", Color.black); // index: 1, Water Surface Color
+                    _riverMat.SetColor("_FogColor", Color.black); // index: 18, Particulate Color
+                    _riverMat.SetFloat("_Glossiness", 0.02f); // index: 2, Water Smoothness
+                    tessellatedRingRenderer.sharedMaterial = _riverMat;
+                    break;
+                }
+            }
+        }
+
+        static IEnumerator UpdateFog() {
+            TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine("updating fog");
+            PlanetaryFogController fog;
+            while(true) {
+                yield return null;
+                var fogSphere = GameObject.Find("RingWorld_Body/Atmosphere_IP/FogSphere");
+                if(fogSphere) {
+                    yield return null;
+                    yield return null;
+                    fog = fogSphere.GetComponent<PlanetaryFogController>();
+                    break;
+                }
+            }
+
+            while(true) {
+                yield return null;
+                if(!fog) {
+                    yield break;
+                }
+                fog.fogDensity = 0.05f;
             }
         }
 
