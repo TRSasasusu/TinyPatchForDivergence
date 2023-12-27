@@ -11,6 +11,7 @@ namespace TinyPatchForDivergence {
         static Coroutine _removeArtificialSun = null;
         static Coroutine _updateFog = null;
         static Coroutine _tuneRiverColor = null;
+        static Coroutine _changeLantern = null;
         static Coroutine _changeTextOfMainframe = null;
 
         static Material _riverMat = null;
@@ -39,6 +40,12 @@ namespace TinyPatchForDivergence {
                         _riverMat = null;
                     }
                     _tuneRiverColor = TinyPatchForDivergence.Instance.StartCoroutine(TuneRiverColor());
+
+                    if(_changeLantern != null) {
+                        TinyPatchForDivergence.Instance.StopCoroutine(_changeLantern);
+                        _changeLantern = null;
+                    }
+                    _changeLantern = TinyPatchForDivergence.Instance.StartCoroutine(ChangeLantern());
 
                     if(_changeTextOfMainframe != null) {
                         TinyPatchForDivergence.Instance.StopCoroutine(_changeTextOfMainframe);
@@ -128,6 +135,33 @@ namespace TinyPatchForDivergence {
                     yield break;
                 }
                 fog.fogDensity = 0.05f;
+            }
+        }
+
+        static IEnumerator ChangeLantern() {
+            TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine("changing lantern");
+            while(true) {
+                yield return null;
+                var brokenLantern = GameObject.Find("RingWorld_Body/Sector_RingInterior/Sector_Zone1/Structures_Zone1/BrokenLanternHouse_Zone1/Props_BrokenLanternHouse_Zone1/Prefab_IP_BROKENLanternItem (1)");
+                if(brokenLantern) {
+                    yield return null;
+                    yield return null;
+                    brokenLantern.SetActive(false);
+                    break;
+                }
+            }
+
+            while(true) {
+                yield return null;
+                //var originalLantern = GameObject.Find("RingWorld_Body/Sector_RingInterior/Sector_Zone3/Sector_HiddenGorge/Sector_DreamFireHouse_Zone3/Interactables_DreamFireHouse_Zone3/Lanterns_DFH_Zone3/Prefab_IP_SimpleLanternItem_Zone3DFH_5");
+                var originalLantern = GameObject.Find("RingWorld_Body/Sector_RingInterior/Sector_Zone1/Sector_DreamFireHouse_Zone1/Interactables_DreamFireHouse_Zone1/Lanterns/Prefab_IP_SimpleLanternItem_Zone1DFH_4");
+                if(originalLantern) {
+                    var lantern = GameObject.Instantiate(originalLantern);
+                    lantern.transform.parent = GameObject.Find("RingWorld_Body").transform;
+                    lantern.transform.localPosition = new Vector3(-127.7076f, 39.9843f, -254.1584f);
+                    lantern.transform.localEulerAngles = new Vector3(19.7637f, 118.1841f, 90.0002f);
+                    break;
+                }
             }
         }
 
