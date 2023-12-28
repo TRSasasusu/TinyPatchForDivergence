@@ -15,6 +15,7 @@ namespace TinyPatchForDivergence {
         static Coroutine _changeTextOfMainframe = null;
 
         static Material _riverMat = null;
+        static Material _underwaterFogMat = null;
 
         public static void Initialize() {
             LoadManager.OnCompleteSceneLoad += (scene, loadScene) => {
@@ -38,6 +39,10 @@ namespace TinyPatchForDivergence {
                     if(_riverMat != null) {
                         GameObject.Destroy(_riverMat);
                         _riverMat = null;
+                    }
+                    if(_underwaterFogMat != null) {
+                        GameObject.Destroy(_underwaterFogMat);
+                        _underwaterFogMat = null;
                     }
                     _tuneRiverColor = TinyPatchForDivergence.Instance.StartCoroutine(TuneRiverColor());
 
@@ -113,6 +118,97 @@ namespace TinyPatchForDivergence {
                     break;
                 }
             }
+
+            TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine("tuning underwater color");
+            while(true) {
+                yield return null;
+                var fluidOxygenVolume = GameObject.Find("RingWorld_Body/Sector_RingWorld/Volumes_RingWorld/FluidOxygenVolume");
+                if(fluidOxygenVolume) {
+                    var effectRuleset = fluidOxygenVolume.GetComponent<EffectRuleset>();
+                    if(effectRuleset) {
+                        _underwaterFogMat = new Material(effectRuleset._material);
+                        _underwaterFogMat.SetColor("_FogColor", new Color(0.00359f, 0.01044f, 0.0149f));
+                        effectRuleset._material = _underwaterFogMat;
+                        TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine("completed tuning underwater color");
+                        break;
+                    }
+                }
+            }
+            //Color basecolor;
+            //string propertyName = "_FogColor";
+            //while(true) {
+            //    yield return null;
+            //    if(!PlayerState.InCloakingField()) {
+            //        continue;
+            //    }
+
+            //    var underwaterEffectBubble = GameObject.Find("Player_Body/PlayerCamera/ScreenEffects/UnderwaterEffectBubble");
+            //    if(!underwaterEffectBubble) {
+            //        continue;
+            //    }
+            //    var meshRenderer = underwaterEffectBubble.GetComponent<MeshRenderer>();
+            //    if(!meshRenderer) {
+            //        continue;
+            //    }
+            //    if(!meshRenderer.sharedMaterial.name.Contains("UnderwaterFogEffectBubble")) {
+            //        continue;
+            //    }
+
+            //    _underwaterFogMat = meshRenderer.material;
+            //    if(!_underwaterFogMat.HasProperty(propertyName)) {
+            //        continue;
+            //    }
+            //    //basecolor = _underwaterFogMat.GetColor(propertyName);
+            //    break;
+            //}
+            //while(true) {
+            //    yield return null;
+            //    if(!PlayerState.InCloakingField() || !_underwaterFogMat) {
+            //        continue;
+            //    }
+            //    _underwaterFogMat.SetColor(propertyName, new Color(0.00359f, 0.01044f, 0.0149f));
+            //}
+
+            //while(true) {
+            //    yield return null;
+            //    var underwaterEffectBubble = GameObject.Find("Player_Body/PlayerCamera/ScreenEffects/UnderwaterEffectBubble");
+            //    if(underwaterEffectBubble) {
+            //        var meshRenderer = underwaterEffectBubble.GetComponent<MeshRenderer>();
+            //        if(meshRenderer) {
+            //            _underwaterFogMat = meshRenderer.material;
+            //            break;
+            //        }
+            //        //_underwaterFogMat = new Material(meshRenderer.sharedMaterial);
+            //        //meshRenderer.material = _underwaterFogMat;
+            //        //break;
+            //    }
+            //}
+            //TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine("found underwater material");
+            ////var propertyID = Shader.PropertyToID("_FogColor");
+            ////var propertyName = "_FogColor";
+            //while(true) {
+            //    yield return null;
+            //    if(PlayerState.InCloakingField()) {
+            //        //_underwaterFogMat.SetColor(p)
+            //    }
+            //    TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine($"InCloakingField: {PlayerState.InCloakingField()}, color: {(_underwaterFogMat.HasProperty("_FogColor") ? _underwaterFogMat.GetColor("_FogColor") : "none")}");
+            //}
+            //var baseColor = _underwaterFogMat.GetColor(propertyName);
+            //var inGDPrev = true;
+            //bool inGDNow;
+            //while(true) {
+            //    yield return null;
+            //    if(inGDPrev != (inGDNow = PlayerState.InGiantsDeep())) {
+            //        if(inGDNow) {
+            //            _underwaterFogMat.SetColor(propertyName, baseColor);
+            //        }
+            //        else {
+            //            TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine("change underwater color");
+            //            _underwaterFogMat.SetColor(propertyName, new Color(baseColor.r * 0.1f, baseColor.g * 0.1f, baseColor.b * 0.1f, 1));
+            //        }
+            //        inGDPrev = inGDNow;
+            //    }
+            //}
         }
 
         static IEnumerator UpdateFog() {
@@ -160,6 +256,11 @@ namespace TinyPatchForDivergence {
                     lantern.transform.parent = GameObject.Find("RingWorld_Body").transform;
                     lantern.transform.localPosition = new Vector3(-127.7076f, 39.9843f, -254.1584f);
                     lantern.transform.localEulerAngles = new Vector3(19.7637f, 118.1841f, 90.0002f);
+                    var simpleLanternItem = lantern.GetComponent<SimpleLanternItem>();
+                    simpleLanternItem.enabled = true;
+                    yield return null;
+                    yield return null;
+                    simpleLanternItem.enabled = false;
                     break;
                 }
             }
