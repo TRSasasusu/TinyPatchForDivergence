@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HarmonyLib;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,7 @@ using UnityEngine;
 using IEnumerator = System.Collections.IEnumerator;
 
 namespace TinyPatchForDivergence {
+    [HarmonyPatch]
     public static class Patch {
         static Coroutine _removeArtificialSun = null;
         static Coroutine _updateFog = null;
@@ -16,6 +18,10 @@ namespace TinyPatchForDivergence {
 
         static Material _riverMat = null;
         static Material _underwaterFogMat = null;
+
+        static DamDestructionController _damDestructionController = null;
+        static DreamCampfire _dreamCampfireZone1 = null;
+        static DreamCampfire _dreamCampfireZone2 = null;
 
         public static void Initialize() {
             LoadManager.OnCompleteSceneLoad += (scene, loadScene) => {
@@ -113,7 +119,7 @@ namespace TinyPatchForDivergence {
                     _riverMat = new Material(tessellatedRingRenderer.sharedMaterial);
                     _riverMat.SetColor("_Color", Color.black); // index: 1, Water Surface Color
                     _riverMat.SetColor("_FogColor", Color.black); // index: 18, Particulate Color
-                    _riverMat.SetFloat("_Glossiness", 0.1f); // index: 2, Water Smoothness
+                    _riverMat.SetFloat("_Glossiness", 0.02f); // index: 2, Water Smoothness
                     tessellatedRingRenderer.sharedMaterial = _riverMat;
                     break;
                 }
@@ -210,7 +216,11 @@ namespace TinyPatchForDivergence {
                     continue;
                 }
                 //TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine("mainframeCDT found");
-                var text = mainframeCDT._xmlCharacterDialogueAsset.text.Replace("DAY", "NIGHT");
+                var text = mainframeCDT._xmlCharacterDialogueAsset.text.Replace("DAY", "NIGHT")
+                                                                       .Replace("<Page>SOLAR SAILS: OK</Page>", "<Page>SOLAR SAILS: OK</Page>\n<Page>DAM INTEGRITY: {{DAM_INTEGRITY}}</Page>")
+                                                                       .Replace("STARLIT COVE: OK", "STARLIT COVE: {{STARLIT_COVE_STATE}}")
+                                                                       .Replace("SHROUDED WOODLANDS: OK", "SHROUDED WOODLANDS: {{SHROUDED_WOODLANDS_STATE}}")
+                                                                       .Replace("Simulation integrity at 99.86%. All modules stable.", "Simulation integrity at {{SIMULATION_INTEGRITY}}. {{SIMULATION_MODULES_STATE}}");
                 var textAsset = new TextAsset(text);
                 mainframeCDT.SetTextXml(textAsset);
                 break;
@@ -228,13 +238,187 @@ namespace TinyPatchForDivergence {
                     TextTranslation.s_theTable.m_table.theTable[key] = "ARTIFICIAL LIGHTING: OK (STAGE: NIGHT)";
                 }
             }
-            TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine("correctly update translation of mainframe");
+            foreach (var key in new string[] {
+                "VerifyRingworldDAM INTEGRITY: {{DAM_INTEGRITY}}",
+                "VerifyRingworld_SignalDAM INTEGRITY: {{DAM_INTEGRITY}}",
+            }) {
+                if (TextTranslation.s_theTable.m_language == TextTranslation.Language.JAPANESE) {
+                    TextTranslation.s_theTable.m_table.theTable[key] = "ダムの完全性:{{DAM_INTEGRITY}}";
+                }
+                else {
+                    TextTranslation.s_theTable.m_table.theTable[key] = "DAM INSTEGRITY: {{DAM_INTEGRITY}}";
+                }
+            }
+            foreach (var key in new string[] {
+                "VerifySimSTARLIT COVE: {{STARLIT_COVE_STATE}}",
+                "VerifySim_SignalSTARLIT COVE: {{STARLIT_COVE_STATE}}",
+            }) {
+                if (TextTranslation.s_theTable.m_language == TextTranslation.Language.JAPANESE) {
+                    TextTranslation.s_theTable.m_table.theTable[key] = "星明かりの入り江:{{STARLIT_COVE_STATE}}";
+                }
+                else {
+                    TextTranslation.s_theTable.m_table.theTable[key] = "STARLIT COVE: {{STARLIT_COVE_STATE}}";
+                }
+            }
+            foreach (var key in new string[] {
+                "VerifySimSHROUDED WOODLANDS: {{SHROUDED_WOODLANDS_STATE}}",
+                "VerifySim_SignalSHROUDED WOODLANDS: {{SHROUDED_WOODLANDS_STATE}}",
+            }) {
+                if (TextTranslation.s_theTable.m_language == TextTranslation.Language.JAPANESE) {
+                    TextTranslation.s_theTable.m_table.theTable[key] = "覆われた森林地帯:{{SHROUDED_WOODLANDS_STATE}}";
+                }
+                else {
+                    TextTranslation.s_theTable.m_table.theTable[key] = "SHROUDED WOODLANDS: {{SHROUDED_WOODLANDS_STATE}}";
+                }
+            }
+            foreach (var key in new string[] {
+                "VerifySimSimulation integrity at {{SIMULATION_INTEGRITY}}. {{SIMULATION_MODULES_STATE}}",
+                "VerifySim_SignalSimulation integrity at {{SIMULATION_INTEGRITY}}. {{SIMULATION_MODULES_STATE}}",
+            }) {
+                if (TextTranslation.s_theTable.m_language == TextTranslation.Language.JAPANESE) {
+                    TextTranslation.s_theTable.m_table.theTable[key] = "模擬現実の完全性は{{SIMULATION_INTEGRITY}}。{{SIMULATION_MODULES_STATE}}";
+                }
+                else {
+                    TextTranslation.s_theTable.m_table.theTable[key] = "Simulation integrity at {{SIMULATION_INTEGRITY}}. {{SIMULATION_MODULES_STATE}}";
+                }
+            }
+            TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine("correctly update translation of mainframe with some variables");
             //TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine("look up keys of translation table");
             //foreach(var key in TextTranslation.s_theTable.m_table.theTable.Keys) {
             //    if(key.Contains("VerifyRingworld")) {
             //        TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine($"{key}: {TextTranslation.s_theTable.m_table.theTable[key]}");
             //    }
             //}
+
+            while(true) {
+                yield return null;
+                var damDestructionController = GameObject.Find("RingWorld_Body/Sector_RingInterior/Geometry_RingInterior/Dam_Root");
+                if(damDestructionController) {
+                    _damDestructionController = damDestructionController.GetComponent<DamDestructionController>();
+                    break;
+                }
+            }
+            while(true) {
+                yield return null;
+                var dreamCampfireZone1 = GameObject.Find("RingWorld_Body/Sector_RingInterior/Sector_Zone1/Sector_DreamFireHouse_Zone1/Interactables_DreamFireHouse_Zone1/DreamFireChamber/Prefab_IP_DreamCampfire/Controller_Campfire");
+                if(dreamCampfireZone1) {
+                    _dreamCampfireZone1 = dreamCampfireZone1.GetComponent<DreamCampfire>();
+                    break;
+                }
+            }
+            while(true) {
+                yield return null;
+                var dreamCampfireZone2 = GameObject.Find("RingWorld_Body/Sector_RingInterior/Sector_Zone2/Sector_DreamFireLighthouse_Zone2_AnimRoot/Interactibles_DreamFireLighthouse_Zone2/DreamFireChamber/Prefab_IP_DreamCampfire/Controller_Campfire");
+                if(dreamCampfireZone2) {
+                    _dreamCampfireZone2 = dreamCampfireZone2.GetComponent<DreamCampfire>();
+                    break;
+                }
+            }
+            TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine("correctly assigned object variables related to mainframe text");
+        }
+
+        //[HarmonyPrefix]
+        //[HarmonyPatch(typeof(TranslatorWord), nameof(TranslatorWord.UpdateDisplayText))]
+        //public static void TranslatorWord_UpdateDisplayText_Prefix(TranslatorWord __instance) {
+        //    TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine($"UpdateDisplayText is called: {__result}");
+        //[HarmonyPostfix]
+        //[HarmonyPatch(typeof(DialogueNode), nameof(DialogueNode.GetNextPage))]
+        //public static void DialogueNode_GetNextPage_Postfix(out string mainText) {
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(TextTranslation), nameof(TextTranslation.Translate))]
+        public static void TextTranslation_Translate_Postfix(ref string __result) {
+            TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine($"Translate is called: {__result}");
+            if(__result.Contains("{{")) {
+                if(__result.Contains("{{DAM_INTEGRITY}}")) {
+                    var damIntegrity = (_damDestructionController ? _damDestructionController.GetIntegrityPercent() : 100);
+                    var collapsed = _damDestructionController ? _damDestructionController._collapsed : false;
+                    string damState;
+                    if(collapsed) {
+                        if(TextTranslation.s_theTable.m_language == TextTranslation.Language.JAPANESE) {
+                            damState = $"0%(崩壊)";
+                        }
+                        else {
+                            damState = $"0% (COLLAPSED)";
+                        }
+                    }
+                    else if(damIntegrity >= 99) {
+                        damState = "100%";
+                    }
+                    else {
+                        if(TextTranslation.s_theTable.m_language == TextTranslation.Language.JAPANESE) {
+                            damState = $"{(int)damIntegrity}.{UnityEngine.Random.Range(0, 10)}{UnityEngine.Random.Range(0, 10)}%(損傷検出)";
+                        }
+                        else {
+                            damState = $"{(int)damIntegrity}.{UnityEngine.Random.Range(0, 10)}{UnityEngine.Random.Range(0, 10)}% (DAMAGE DETECTED)";
+                        }
+                    }
+                    __result = __result.Replace("{{DAM_INTEGRITY}}", damState);
+                }
+                else if(__result.Contains("{{STARLIT_COVE_STATE}}")) {
+                    var ok = _dreamCampfireZone2 ? _dreamCampfireZone2._state == Campfire.State.LIT : true;
+                    string state;
+                    if(ok) {
+                        state = "OK";
+                    }
+                    else {
+                        if(TextTranslation.s_theTable.m_language == TextTranslation.Language.JAPANESE) {
+                            state = "炎に致命的なエラー";
+                        }
+                        else {
+                            state = "FATAL ERROR IN THE FLAMES";
+                        }
+                    }
+                    __result = __result.Replace("{{STARLIT_COVE_STATE}}", state);
+                }
+                else if(__result.Contains("{{SHROUDED_WOODLANDS_STATE}}")) {
+                    var ok = _dreamCampfireZone1 ? _dreamCampfireZone1._state == Campfire.State.LIT : true;
+                    string state;
+                    if(ok) {
+                        state = "OK";
+                    }
+                    else {
+                        if(TextTranslation.s_theTable.m_language == TextTranslation.Language.JAPANESE) {
+                            state = "炎に致命的なエラー";
+                        }
+                        else {
+                            state = "FATAL ERROR IN THE FLAMES";
+                        }
+                    }
+                    __result = __result.Replace("{{SHROUDED_WOODLANDS_STATE}}", state);
+                }
+                else if(__result.Contains("{{SIMULATION_INTEGRITY}}")) {
+                    string integrity;
+                    string state;
+                    if(!_dreamCampfireZone1 || _dreamCampfireZone1._state == Campfire.State.LIT) {
+                        integrity = "99.86%";
+                        if(TextTranslation.s_theTable.m_language == TextTranslation.Language.JAPANESE) {
+                            state = "すべてのモジュールが安定しています。";
+                        }
+                        else {
+                            state = "All modules stable.";
+                        }
+                    }
+                    else if(_dreamCampfireZone2 && _dreamCampfireZone2._state == Campfire.State.LIT) {
+                        integrity = "87.12%";
+                        if(TextTranslation.s_theTable.m_language == TextTranslation.Language.JAPANESE) {
+                            state = "注意:1つのモジュールにエラーが発生しています。";
+                        }
+                        else {
+                            state = "WARNING: An error has occurred in one module.";
+                        }
+                    }
+                    else {
+                        integrity = "51.37%";
+                        if(TextTranslation.s_theTable.m_language == TextTranslation.Language.JAPANESE) {
+                            state = "注意:2つのモジュールにエラーが発生しています。";
+                        }
+                        else {
+                            state = "WARNING: Errors have occurred in two modules.";
+                        }
+                    }
+                    __result = __result.Replace("{{SIMULATION_INTEGRITY}}", integrity).Replace("{{SIMULATION_MODULES_STATE}}", state);
+                }
+            }
         }
     }
 }

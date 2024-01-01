@@ -1,5 +1,7 @@
-﻿using OWML.Common;
+﻿using HarmonyLib;
+using OWML.Common;
 using OWML.ModHelper;
+using System.Reflection;
 
 namespace TinyPatchForDivergence {
     public class TinyPatchForDivergence : ModBehaviour {
@@ -7,6 +9,7 @@ namespace TinyPatchForDivergence {
 
         private void Awake() {
             Instance = this;
+            Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
         }
 
         private void Start() {
