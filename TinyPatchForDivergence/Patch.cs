@@ -246,7 +246,7 @@ namespace TinyPatchForDivergence {
                     TextTranslation.s_theTable.m_table.theTable[key] = "ダムの完全性:{{DAM_INTEGRITY}}";
                 }
                 else {
-                    TextTranslation.s_theTable.m_table.theTable[key] = "DAM INSTEGRITY: {{DAM_INTEGRITY}}";
+                    TextTranslation.s_theTable.m_table.theTable[key] = "DAM INTEGRITY: {{DAM_INTEGRITY}}";
                 }
             }
             foreach (var key in new string[] {
