@@ -117,7 +117,7 @@ namespace TinyPatchForDivergence {
                 if(river) {
                     var tessellatedRingRenderer = river.GetComponent<TessellatedRingRenderer>();
                     _riverMat = new Material(tessellatedRingRenderer.sharedMaterial);
-                    _riverMat.SetColor("_Color", Color.black); // index: 1, Water Surface Color
+                    //_riverMat.SetColor("_Color", Color.black); // index: 1, Water Surface Color
                     _riverMat.SetColor("_FogColor", Color.black); // index: 18, Particulate Color
                     _riverMat.SetFloat("_Glossiness", 0.02f); // index: 2, Water Smoothness
                     tessellatedRingRenderer.sharedMaterial = _riverMat;
@@ -164,8 +164,8 @@ namespace TinyPatchForDivergence {
                 if(fog.fogDensity < 0.05f) {
                     fog.fogDensity = 0.05f;
                 }
-                if(fog.fogDensity > 0.17f) {
-                    fog.fogDensity = 0.17f;
+                if(fog.fogDensity > 0.37f) {
+                    fog.fogDensity = 0.37f;
                 }
             }
         }
