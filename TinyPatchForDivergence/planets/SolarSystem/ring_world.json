@@ -1,0 +1,78 @@
+{
+  "$schema": "https://raw.githubusercontent.com/xen-42/outer-wilds-new-horizons/main/NewHorizons/Schemas/body_schema.json",
+  "name": "RINGWORLD",
+  "Props": {
+    "details": [
+      {
+        "path": "TimberHearth_Body/Sector_TH/Sector_Village/Sector_StartingCamp/Props_StartingCamp/OtherComponentsGroup/Props_HEA_CampsiteSleepingBag",
+        "position": {
+          "x": 8.6974,
+          "y": -8.7928,
+          "z": -70.8026
+        },
+        "rotation": {
+          "x": 0,
+          "y": 100.1441,
+          "z": 0
+        },
+        "parentPath": "Sector_RingWorld/Sector_ObservationDeck/Props_ObservationDeck/OtherComponentsGroup",
+        "isRelativeToParent": true
+      },
+      {
+        "path": "TimberHearth_Body/Sector_TH/Sector_RadioTower/RadioTower_DLC/Props_RadioTower/OtherComponentsGroup/Props_Grove/Props_HEA_CampsiteTableSetting/Props_HEA_MarshmallowStick",
+        "position": {
+          "x": 10.6974,
+          "y": -8.9528,
+          "z": -71.2026
+        },
+        "rotation": {
+          "x": 0,
+          "y": 280,
+          "z": 88
+        },
+        "parentPath": "Sector_RingWorld/Sector_ObservationDeck/Props_ObservationDeck/OtherComponentsGroup",
+        "isRelativeToParent": true
+      },
+      {
+        "path": "BrittleHollow_Body/Sector_BH/Sector_Crossroads/Props_Crossroads/OtherComponentsGroup/Reibeck_Camp/Props_HEA_CampsiteTableSetting/Props_HEA_MarshmallowCanClosed1",
+        "position": {
+          "x": 11.1974,
+          "y": -8.9828,
+          "z": -72.7326
+        },
+        "rotation": {
+          "x": 0,
+          "y": 60,
+          "z": 0
+        },
+        "parentPath": "Sector_RingWorld/Sector_ObservationDeck/Props_ObservationDeck/OtherComponentsGroup",
+        "isRelativeToParent": true
+      },
+      {
+        "path": "BrittleHollow_Body/Sector_BH/Sector_Crossroads/Props_Crossroads/OtherComponentsGroup/Reibeck_Camp/Props_HEA_CampsiteTableSetting/Props_HEA_MarshmallowCanClosed1",
+        "position": {
+          "x": 9.8974,
+          "y": -8.9828,
+          "z": -72.2326
+        },
+        "rotation": {
+          "x": 0,
+          "y": 340,
+          "z": 0
+        },
+        "parentPath": "Sector_RingWorld/Sector_ObservationDeck/Props_ObservationDeck/OtherComponentsGroup",
+        "isRelativeToParent": true
+      },
+      {
+        "path": "Moon_Body/Sector_THM/Interactables_THM/Props_HEA_MarshmallowCanBad",
+        "position": {
+          "x": 9.0974,
+          "y": -11.9758,
+          "z": -73.8026
+        },
+        "parentPath": "Sector_RingWorld/Sector_ObservationDeck/Props_ObservationDeck/OtherComponentsGroup",
+        "isRelativeToParent": true
+      }
+    ]
+  }
+}

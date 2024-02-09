@@ -327,7 +327,7 @@ namespace TinyPatchForDivergence {
         [HarmonyPostfix]
         [HarmonyPatch(typeof(TextTranslation), nameof(TextTranslation.Translate))]
         public static void TextTranslation_Translate_Postfix(ref string __result) {
-            TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine($"Translate is called: {__result}");
+            //TinyPatchForDivergence.Instance.ModHelper.Console.WriteLine($"Translate is called: {__result}");
             if(__result.Contains("{{")) {
                 if(__result.Contains("{{DAM_INTEGRITY}}")) {
                     var damIntegrity = (_damDestructionController ? _damDestructionController.GetIntegrityPercent() : 100);
