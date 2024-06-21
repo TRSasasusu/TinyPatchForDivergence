@@ -27,9 +27,4 @@
   <ItemGroup>
     <Content Include="TinyPatchForDivergence.csproj.user" />
   </ItemGroup>
-  <ItemGroup>
-    <None Update="planets\SolarSystem\ring_world.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 </Project>
