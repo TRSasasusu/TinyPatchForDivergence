@@ -15,6 +15,7 @@ namespace TinyPatchForDivergence {
         static Coroutine _tuneRiverColor = null;
         static Coroutine _changeLantern = null;
         static Coroutine _changeTextOfMainframe = null;
+        static Coroutine _tuneLighting = null;
 
         static Material _riverMat = null;
         static Material _underwaterFogMat = null;
@@ -63,6 +64,12 @@ namespace TinyPatchForDivergence {
                         _changeTextOfMainframe = null;
                     }
                     _changeTextOfMainframe = TinyPatchForDivergence.Instance.StartCoroutine(ChangeTextOfMainframe());
+
+                    if(_tuneLighting != null) {
+                        TinyPatchForDivergence.Instance.StopCoroutine(_tuneLighting);
+                        _tuneLighting = null;
+                    }
+                    _tuneLighting = TinyPatchForDivergence.Instance.StartCoroutine(TuneLighting());
                 }
             };
         }
@@ -199,6 +206,82 @@ namespace TinyPatchForDivergence {
                     simpleLanternItem.enabled = false;
                     break;
                 }
+            }
+        }
+
+        static IEnumerator TuneLighting() {
+            //while(true) {
+            //    yield return null;
+            //    var lightOnDeck = GameObject.Find("RingWorld_Body/Sector_RingWorld/Sector_ObservationDeck/Lighting_ObservationDeck/OtherComponentsGroup/Prefab_IP_Lantern_Hanging/Prop_IP_Lantern_Hanging");
+            //    if(lightOnDeck) {
+            //        var 
+            //    }
+            //}
+            while(true) {
+                yield return null;
+                var spotlightOnDeck = GameObject.Find("RingWorld_Body/Sector_RingWorld/Sector_ObservationDeck/Lighting_ObservationDeck/OtherComponentsGroup/Prefab_IP_Lantern_Hanging/PointLight_Lantern_Large");
+                if(spotlightOnDeck) {
+                    spotlightOnDeck.transform.localPosition = new Vector3(3.655f, -4.1401f, 5.5517f);
+                    var light = spotlightOnDeck.GetComponent<Light>();
+                    light.intensity = 1.5f;
+                    break;
+                }
+            }
+
+            while(true) {
+                yield return null;
+                var spotlightOnJamming = GameObject.Find("RingWorld_Body/Sector_RingInterior/Sector_Zone4/Sector_BlightedShore/Sector_JammingControlRoom_Zone4/Lighting_JammingControlRoom_Zone4/VisibleFromFar_Lighting_JammingControlRoom_Zone4/Prefab_IP_Lantern_Wall (4)/PointLight_Lantern");
+                if(spotlightOnJamming) {
+                    spotlightOnJamming.transform.localPosition = new Vector3(1.5575f, -0.3676f, 0.0001f);
+                    var light = spotlightOnJamming.GetComponent<Light>();
+                    light.intensity = 0.5f;
+                    light.range = 20;
+                    light.color = new Color(0.48f, 1f, 0.986f);
+                    break;
+                }
+            }
+
+            Light lightEyeSymbol = null;
+            while(true) {
+                yield return null;
+                var spotlightEyeSymbol = GameObject.Find("RingWorld_Body/Sector_RingInterior/Sector_Zone2/Structures_Zone2/EyeTempleRuins_Zone2/Lighting_EyeTempleRuins_Zone2/SpotLight_EyeSymbol");
+                if(spotlightEyeSymbol) {
+                    lightEyeSymbol = spotlightEyeSymbol.GetComponent<Light>();
+                    lightEyeSymbol.intensity = 1.5f;
+                    lightEyeSymbol.range = 40;
+                    lightEyeSymbol.color = new Color(0.48f, 1f, 0.986f);
+                    break;
+                }
+            }
+
+            while(true) {
+                yield return null;
+                var spotlightFuelNearEyeSymbol = GameObject.Find("RingWorld_Body/Sector_RingInterior/Sector_Zone2/Structures_Zone2/EyeTempleRuins_Zone2/Lighting_EyeTempleRuins_Zone2/FillLight_FuelTorches");
+                if(spotlightFuelNearEyeSymbol) {
+                    spotlightFuelNearEyeSymbol.SetActive(false);
+                    break;
+                }
+            }
+
+            while(true) {
+                yield return null;
+                var spotlightLab = GameObject.Find("RingWorld_Body/Sector_RingWorld/Sector_SecretEntrance/Lighting_SecretEntrance/OtherComponentsGroup/HangingLanterns/Prefab_IP_Lantern_Hanging/PointLight_Lantern_Large");
+                if(spotlightLab) {
+                    spotlightLab.transform.localPosition = new Vector3(0.6759f, -13.0267f, 0.9658f);
+                    var light = spotlightLab.GetComponent<Light>();
+                    light.intensity = 1.4f;
+                    light.range = 14;
+                    light.color = new Color(0.48f, 1f, 0.986f);
+                    break;
+                }
+            }
+
+            while (true) {
+                yield return null;
+                if(!lightEyeSymbol) {
+                    break;
+                }
+                lightEyeSymbol.intensity = 1.5f;
             }
         }
 
