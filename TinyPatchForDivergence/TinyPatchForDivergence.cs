@@ -13,6 +13,8 @@ namespace TinyPatchForDivergence {
         }
 
         private void Start() {
+            var newHorizonsAPI = ModHelper.Interaction.TryGetModApi<INewHorizons>("xen.NewHorizons");
+            newHorizonsAPI.LoadConfigs(this);
             ModHelper.Console.WriteLine($"{nameof(TinyPatchForDivergence)} is loaded!", MessageType.Success);
             Patch.Initialize();
         }

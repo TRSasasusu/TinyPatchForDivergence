@@ -1,0 +1,6 @@
+{
+  "$schema": "https://raw.githubusercontent.com/xen-42/outer-wilds-new-horizons/main/NewHorizons/Schemas/translation_schema.json",
+  "DialogueDictionary": {
+    "So, just to make sure that I'm getting this right. There are two different species that came before us in this system. One of them was (obviously) the Nomai, who lived here thousands of years ago if not more - and then you have this other, mystery civilization that's been here for... how long, exactly? And this is the first we're hearing about them?": "それから、まずは正しく理解したいから。この星系には私らよりも前に2つの異なる種族が存在した。そのうちの1つは(明らかに)Nomaiで、数千年前、あるいはそれよりも前にここに住んでいた - そしてもう1つ、謎の文明がここに…実際どれだけの間いたのだろうか？彼らについて触れるのはこれが初めてなのだろうか？"
+  }
+}
